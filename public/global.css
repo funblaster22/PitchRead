@@ -1,0 +1,97 @@
+:root {
+	--color-button: #3CCFCF;
+	--incorrect-bg: rgba(255, 35, 0, 0.1);
+	--incorrect-outline: #FF9C8C;
+	--correct-bg: rgba(35, 178, 109, 0.1);
+	--correct-outline: #23b26d;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background-color: #f6f7fb;
+	overflow: hidden;
+	/* TODO: if I cared about iOS, I would fix the bug where the content is cut off at the bottom */
+}
+
+body {
+	color: #333;
+	background-color: #eeeeee;
+	margin: 0;
+	padding: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+a {
+	color: rgb(0,100,200);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color: rgb(0,80,160);
+}
+
+label {
+	display: block;
+}
+
+input, button, select, textarea {
+	font-family: inherit;
+	font-size: inherit;
+	padding: 0.4em;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+
+input:disabled {
+	color: #ccc;
+}
+
+button {
+	color: #333;
+	background-color: #f4f4f4;
+	outline: none;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+button:disabled {
+	color: #999;
+}
+
+button:not(:disabled):active {
+	background-color: #ddd;
+}
+
+button:focus {
+	border-color: #666;
+}
+
+h3 {
+	margin: 0 0 1em 0;
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #ccc;
+	border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #8d8d8d;
+}
