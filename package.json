@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "start nodemon server.js & vite",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
+    "aubiojs": "^0.0.1",
     "express": "^4.17.3",
     "nodemon": "^2.0.15"
   },

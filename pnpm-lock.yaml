@@ -3,6 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@sveltejs/vite-plugin-svelte': ^1.0.0-next.30
   '@tsconfig/svelte': ^2.0.1
+  aubiojs: ^0.0.1
   express: ^4.17.3
   nodemon: ^2.0.15
   svelte: ^3.44.0
@@ -13,8 +14,10 @@ specifiers:
   vite: ^2.8.0
 
 dependencies:
+  aubiojs: 0.0.1
   express: 4.17.3
   nodemon: 2.0.15
+  pitchfinder: 2.3.2
 
 devDependencies:
   '@sveltejs/vite-plugin-svelte': 1.0.0-next.38_svelte@3.46.4+vite@2.8.4
@@ -148,6 +151,10 @@ packages:
 
   /array-flatten/1.1.1:
     resolution: {integrity: sha1-ml9pkFGx5wczKPKgCJaLZOopVdI=}
+    dev: false
+
+  /aubiojs/0.0.1:
+    resolution: {integrity: sha512-syfx2lUAtNwhol2eTcO7kevGcplCz3uEbzFynzxCLYekTsXpxEspbfPPeguF4NOcKCmWfEiNRMTmMtvslb/H7g==}
     dev: false
 
   /balanced-match/1.0.2:
