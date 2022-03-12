@@ -7,20 +7,21 @@
     import Vex from "vexflow";
 
     let musicStaff: HTMLElement;
+    // In the format <note><accidental>/<octave>, replacing the values in square brackets
+    export let currentNote: string;
 
-    // I want ScrollingStaff to do something like this: https://jsfiddle.net/stevenkaspar/8gLbetyy/
-    // Relates to this issue: https://github.com/0xfe/vexflow/issues/544
+    // Relates to [this issue](https://github.com/0xfe/vexflow/issues/544), which proposes https://jsfiddle.net/stevenkaspar/8gLbetyy/
+    // Adapted from https://jsfiddle.net/gristow/Ln76ysjv/
     onMount(() => {
         // Basic setup boilerplate for using VexFlow with the SVG rendering context:
-        VF = Vex.Flow;
+        const VF = Vex.Flow;
 
         // Create an SVG renderer and attach it to the DIV element named "boo".
-        var div = document.getElementById("boo")
-        var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+        const renderer = new VF.Renderer(musicStaff, VF.Renderer.Backends.SVG);
 
         // Configure the rendering context.
-        renderer.resize(500, 500);
-        var context = renderer.getContext();
+        renderer.resize(401, 125);
+        const context = renderer.getContext();
 
         // A tickContext is required to draw anything that would be placed
         // in relation to time/rhythm, including StaveNote which we use here.
@@ -34,26 +35,19 @@
         // notes, and space them relative to each other based on their duration &
         // the space available. We definitely do not want that here! So, instead
         // of creating a voice, we handle that part of the drawing manually.
-        var tickContext = new VF.TickContext();
+        const tickContext = new VF.TickContext();
 
         // Create a stave of width 10000 at position 10, 40 on the canvas.
-        var stave = new VF.Stave(10, 10, 10000)
+        const stave = new VF.Stave(10, 10, 10000)
             .addClef('treble');
 
         // Connect it to the rendering context and draw!
         stave.setContext(context).draw();
 
-        var durations = ['8', '4', '2', '1'];
+        const durations = ['8', '4', '2', '1'];
 
-        var notes = [
-            ['c', '#', '4'],
-            ['e', 'b', '5'],
-            ['g', '', '5'],
-            ['d', 'b', '4'],
-            ['b', 'bb', '3'],
-            ['a', 'b', '4'],
-            ['f', 'b', '5'],
-        ].map(([letter, acc, octave]) => {
+        function makeNote([letter, acc, octave]) {
+            console.log(`${letter}${acc}/${octave}`);
             const note = new VF.StaveNote({
                 clef: 'treble',
                 keys: [`${letter}${acc}/${octave}`],
@@ -71,36 +65,49 @@
             // note or so we might render a natural sign randomly, just to be
             // sure our user who's learning to read accidentals learns
             // what the natural symbol means.)
-            if (acc) note.addAccidental(0, new VF.Accidental(acc));
-            tickContext.addTickable(note)
+            if(acc) note.addAccidental(0, new VF.Accidental(acc));
+            tickContext.addTickable(note);
+            // The tickContext.preFormat() call assigns x-values (and other
+            // formatting values) to notes. It must be called after we've
+            // created the notes and added them to the tickContext. Or, it
+            // can be called each time a note is added, if the number of
+            // notes needed is not known at the time of bootstrapping.
+            //
+            // To see what happens if you put it in the wrong place, try moving
+            // this line up to where the TickContext is initialized, and check
+            // out the error message you get.
+            //
+            // tickContext.setX() establishes the left-most x position for all
+            // of the 'tickables' (notes, etc...) in a context.
+            tickContext.preFormat().setX(400);  // Necessary on every call to avoid 'unformatted note' errors
             return note;
-        });
+        }
 
-        // The tickContext.preFormat() call assigns x-values (and other
-        // formatting values) to notes. It must be called after we've
-        // created the notes and added them to the tickContext. Or, it
-        // can be called each time a note is added, if the number of
-        // notes needed is not known at the time of bootstrapping.
-        //
-        // To see what happens if you put it in the wrong place, try moving
-        // this line up to where the TickContext is initialized, and check
-        // out the error message you get.
-        //
-        // tickContext.setX() establishes the left-most x position for all
-        // of the 'tickables' (notes, etc...) in a context.
-        tickContext.preFormat().setX(400);
+        const notes = [
+            ['c', '#', '4'],
+            ['e', 'b', '5'],
+            ['g', '', '5'],
+            ['d', 'b', '4'],
+            ['b', 'bb', '3'],
+            ['a', 'b', '4'],
+            ['f', 'b', '5'],
+        ].map(makeNote);
 
         // This will contain any notes that are currently visible on the staff,
         // before they've either been answered correctly, or plumetted off
         // the staff when a user fails to answer them correctly in time.
         // TODO: Add sound effects.
-        const visibleNoteGroups = [];
+        const visibleNoteGroups: SVGElement[] = [];
 
         // Add a note to the staff from the notes array (if there are any left).
-        document.getElementById('add-note').addEventListener('click', (e) => {
-            note = notes.shift();
-            if (!note) return;
-            const group = context.openGroup();
+        document.getElementById('add-note').addEventListener('click', addNote);
+        function addNote() {
+            // TODO: right now, none of them work
+            const acc = ['bb', 'b', '', '#', '##'][Math.floor(Math.random() * 5)]
+            notes.push(makeNote([(Math.floor(Math.random() * 7) + 10).toString(36), acc, Math.floor(Math.random() * 3) + 3]));
+            const note = notes.shift();
+            if(!note) return;
+            const group = context.openGroup() as SVGGElement;
             visibleNoteGroups.push(group);
             note.draw();
             context.closeGroup();
@@ -119,15 +126,18 @@
             // If a user doesn't answer in time make the note fall below the staff
             window.setTimeout(() => {
                 const index = visibleNoteGroups.indexOf(group);
-                if (index === -1) return;
+                if(index === -1) return;
                 group.classList.add('too-slow');
                 visibleNoteGroups.shift();
+                setTimeout(() => group.remove(), 5000);
             }, 5000);
-        });
+        }
+        setInterval(addNote, 500);
 
         // If a user plays/identifies the note in time, send it up to note heaven.
-        document.getElementById('right-answer').addEventListener('click', (e) => {
-            group = visibleNoteGroups.shift();
+        document.getElementById('right-answer').addEventListener('click', rightAnswer)
+        function rightAnswer() {
+            const group = visibleNoteGroups.shift();
             group.classList.add('correct');
             // The note will be somewhere in the middle of its move to the left -- by
             // getting its computed style we find its x-position, freeze it there, and
@@ -141,11 +151,19 @@
             const x = transformMatrix.split(',')[4].trim();
             // And, finally, we set the note's style.transform property to send it skyward.
             group.style.transform = `translate(${x}px, -800px)`;
-        })
+            setTimeout(() => group.remove(), 5000);
+        }
     });
 </script>
 
 <div id="staff" bind:this={musicStaff}>
+    <g class="vf-stavenote" id="vf-auto8132"><g class="vf-note" pointer-events="bounding-box">
+        <g class="vf-notehead" pointer-events="bounding-box">
+            <path stroke-width="0.3" fill="black" stroke="none" stroke-dasharray="none" d="M453 105M453 104.91576C453 107.63952,455.30256 110.0544,461.33976 110.0544C467.96664 110.0544,470.07264 107.75184,470.07264 104.91576C470.07264 102.0516,465.4956 99.9456,461.73288 99.9456C456.3696 99.9456,453 102.16392,453 104.91576M457.38048 103.42752C457.38048 103.09056,457.40856 102.78168,457.4928 102.44472C457.94208 101.04072,459.43032 100.84416,460.69392 100.84416C463.47384 100.84416,465.69216 103.82064,465.69216 106.2636C465.69216 107.49912,465.15864 108.6504,463.83888 108.95928C463.44576 109.0716,462.99648 109.12776,462.57528 109.12776C461.11512 109.12776,459.62688 108.14496,458.78448 107.02176C457.97016 106.09512,457.38048 104.7192,457.38048 103.42752"></path>
+        </g>
+    </g>
+        <g class="vf-modifiers"></g>
+    </g>
 </div>
 <div id="controls">
     <button id='add-note'>Add Note</button>
