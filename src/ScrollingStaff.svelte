@@ -53,6 +53,15 @@
         // Format and justify the notes to 400 pixels.
         const formatter = new VF.Formatter().joinVoices([voice]).format([voice], 400);
 
+        const moveNotes = () => {
+            notes.forEach(note => note.x_shift -= 1);
+            voice.draw(context, stave);
+            requestAnimationFrame(moveNotes);
+        }
+        // TODO: uncomment to run, need to clear each frame
+        //moveNotes();
+        //VF.StaveNote.format(notes, {left_shift: 50, right_shift: 50, text_line: 0}); doesn't seem to do what I want
+
         // Render voice
         voice.draw(context, stave);
     });
