@@ -5,10 +5,21 @@
     // TODO: for some reason the typing on this module is funky
     // Also considering https://www.verovio.org/index.xhtml, but the docs are lacking
     import Vex from "vexflow";
+    import Note = Vex.Flow.Note;
 
     let musicStaff: HTMLElement;
     // In the format <note><accidental>/<octave>, replacing the values in square brackets
-    export let currentNote: string;
+    export let currentPitch: number;
+    export let transpose = 0;
+    export let events: EventTarget;
+    export let paused = true;  // TODO: use this instead of events
+
+    // Having to declare in global scope doesn't feel very Svelte-like
+    let playingNoteGroup: SVGGElement;
+    // 69 is the value of a4
+    // TODO: because increments between notes are not uniform (e,f & b,c) it can get off but should be fine for now
+    $: if (playingNoteGroup) playingNoteGroup.style.transform = "translateY(" + (69 - currentPitch + transpose) * 2.5 + "px)";
+    $: console.log("GLOBAL", "translateY(" + (currentPitch - 69 + transpose) * 5 + "px)");
 
     // Relates to [this issue](https://github.com/0xfe/vexflow/issues/544), which proposes https://jsfiddle.net/stevenkaspar/8gLbetyy/
     // Adapted from https://jsfiddle.net/gristow/Ln76ysjv/
@@ -36,6 +47,7 @@
         // the space available. We definitely do not want that here! So, instead
         // of creating a voice, we handle that part of the drawing manually.
         const tickContext = new VF.TickContext();
+        const playingTickContext = new VF.TickContext();
 
         // Create a stave of width 10000 at position 10, 40 on the canvas.
         const stave = new VF.Stave(10, 10, 10000)
@@ -83,24 +95,30 @@
             return note;
         }
 
-        const notes = [
-            ['c', '#', '4'],
-            ['e', 'b', '5'],
-            ['g', '', '5'],
-            ['d', 'b', '4'],
-            ['b', 'bb', '3'],
-            ['a', 'b', '4'],
-            ['f', 'b', '5'],
-        ].map(makeNote);
+        const notes: Note[] = [];
+
+        const playingNote = new VF.StaveNote({
+            clef: 'treble',
+            keys: [`a/4`],
+            duration: '1',
+        })
+            .setContext(context)
+            .setStave(stave);
+
+        playingTickContext.addTickable(playingNote);
+        playingTickContext.preFormat().setX(0);
+        playingNoteGroup = context.openGroup() as SVGGElement;
+        playingNote.draw();
+        context.closeGroup();
+        playingNoteGroup.classList.add("playingNote")
 
         // This will contain any notes that are currently visible on the staff,
-        // before they've either been answered correctly, or plumetted off
+        // before they've either been answered correctly, or plummeted off
         // the staff when a user fails to answer them correctly in time.
         // TODO: Add sound effects.
         const visibleNoteGroups: SVGElement[] = [];
 
         // Add a note to the staff from the notes array (if there are any left).
-        document.getElementById('add-note').addEventListener('click', addNote);
         function addNote() {
             // TODO: right now, none of them work
             const acc = ['bb', 'b', '', '#', '##'][Math.floor(Math.random() * 5)]
@@ -131,11 +149,12 @@
                 visibleNoteGroups.shift();
                 setTimeout(() => group.remove(), 5000);
             }, 5000);
+            /*playingNote.addAccidental(0, new VF.Accidental(acc));
+            playingTickContext.preFormat().setX(0);
+            playingNote.draw();  // TODO: seems like the best way to do this involves creating a group*/
         }
-        setInterval(addNote, 500);
 
         // If a user plays/identifies the note in time, send it up to note heaven.
-        document.getElementById('right-answer').addEventListener('click', rightAnswer)
         function rightAnswer() {
             const group = visibleNoteGroups.shift();
             group.classList.add('correct');
@@ -153,6 +172,17 @@
             group.style.transform = `translate(${x}px, -800px)`;
             setTimeout(() => group.remove(), 5000);
         }
+
+        let animateInterval: number;
+        events.addEventListener("resume", resume);
+        function resume() {
+            animateInterval = window.setInterval(addNote, 500);
+        }
+
+        events.addEventListener("pause", pause);
+        function pause() {
+            clearInterval(animateInterval);
+        }
     });
 </script>
 
@@ -164,10 +194,6 @@
     </g>
         <g class="vf-modifiers"></g>
     </g>
-</div>
-<div id="controls">
-    <button id='add-note'>Add Note</button>
-    <button id='right-answer'>Right Answer</button>
 </div>
 
 <style global>
@@ -185,5 +211,9 @@
 
     .too-slow {
         transform: translate(-400px, 2000px);
+    }
+
+    .playingNote {
+        transition: transform 100ms linear;
     }
 </style>
