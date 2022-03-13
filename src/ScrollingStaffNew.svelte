@@ -9,7 +9,7 @@
 
     let musicStaff: HTMLElement;
     // In the format <note><accidental>/<octave>, replacing the values in square brackets
-    export let currentPitch: number;
+    export let currentPitch: {name, value, cents, octave, frequency};
     export let transpose = 0;
     export let events: EventTarget;
     export let paused = true;  // TODO: use this instead of events
@@ -18,8 +18,8 @@
     let playingNoteGroup: SVGGElement;
     // 69 is the value of a4
     // TODO: because increments between notes are not uniform (e,f & b,c) it can get off but should be fine for now
-    $: if (playingNoteGroup) playingNoteGroup.style.transform = "translateY(" + (69 - currentPitch + transpose) * 2.5 + "px)";
-    $: console.log("GLOBAL", "translateY(" + (currentPitch - 69 + transpose) * 5 + "px)");
+    $: if (playingNoteGroup) playingNoteGroup.style.transform = "translateY(" + (69 - currentPitch.value + transpose) * 2.5 + "px)";
+    $: console.log(currentPitch);
 
     // Relates to [this issue](https://github.com/0xfe/vexflow/issues/544), which proposes https://jsfiddle.net/stevenkaspar/8gLbetyy/
     // Adapted from https://jsfiddle.net/gristow/Ln76ysjv/
@@ -121,14 +121,16 @@
         // Add a note to the staff from the notes array (if there are any left).
         function addNote() {
             // TODO: right now, none of them work
-            const acc = ['bb', 'b', '', '#', '##'][Math.floor(Math.random() * 5)]
-            notes.push(makeNote([(Math.floor(Math.random() * 7) + 10).toString(36), acc, Math.floor(Math.random() * 3) + 3]));
+            const acc = ['b', '', '#'][Math.floor(Math.random() * 5)]
+            const details = [(Math.floor(Math.random() * 7) + 10).toString(36), acc, Math.floor(Math.random() * 2) + 4];
+            notes.push(makeNote(details));
             const note = notes.shift();
             if(!note) return;
             const group = context.openGroup() as SVGGElement;
             visibleNoteGroups.push(group);
             note.draw();
             context.closeGroup();
+            group.dataset.notename = details[0] + details[1] + "/" + details[2]
             group.classList.add('scroll');
             // Force a dom-refresh by asking for the group's bounding box. Why? Most
             // modern browsers are smart enough to realize that adding .scroll class
@@ -173,10 +175,19 @@
             setTimeout(() => group.remove(), 5000);
         }
 
+        function check() {
+            console.log("CHECKING", visibleNoteGroups[0]?.dataset?.notename);
+            // TODO: doesn't account for note synonyms
+            if (currentPitch?.name?.toLowerCase() + "/" + currentPitch.octave === visibleNoteGroups[0]?.dataset?.notename)
+                rightAnswer();
+            requestAnimationFrame(check);
+        }
+        check();
+
         let animateInterval: number;
         events.addEventListener("resume", resume);
         function resume() {
-            animateInterval = window.setInterval(addNote, 500);
+            animateInterval = window.setInterval(addNote, 1000);
         }
 
         events.addEventListener("pause", pause);

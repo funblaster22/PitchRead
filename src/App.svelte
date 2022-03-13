@@ -4,7 +4,7 @@
   import ScrollingStaff from "./ScrollingStaffNew.svelte";
   const tuner = new Tuner(440);
   let currentPitch = 440;
-  tuner.onNoteDetected = note => currentPitch = note.value;
+  tuner.onNoteDetected = note => currentPitch = note;
   const dispatcher = new EventTarget();
 
   // Seconds until the game resumes. -1 means indefinitely
