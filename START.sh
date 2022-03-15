@@ -1,4 +1,12 @@
 #!/bin/bash
+
+# Install deps if missing
+if ! which node > /dev/null; then
+    # Installing from https://github.com/nodesource/distributions/blob/master/README.md#installation-instructions
+    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+fi
+
 # If running for the first time, delete node_packages, shrink-wrap.yml and package-lock.json
 read -n 1 -t 3 -p "Do you want to fetch new changes (OVERRIDES local changes!) " sync
 if [ "$sync" == "y" ]; then
@@ -22,3 +30,8 @@ fi
 cp scores.json dist/scores-backup.json
 
 npm start
+
+echo "Pitch Reader" | figlet
+echo $(cat README.md)
+
+xdg-open http://stackoverflow.com
