@@ -26,12 +26,17 @@ if [ "$sync" == "y" ]; then
   fi
 fi
 
+# Install npm packages
+if [ -f "$FILE" ]; then
+    echo "Updating packages..."
+    npm install
+fi
+
 # Create backup of accounts.json file
 cp scores.json dist/scores-backup.json
 
-npm start
-
 echo "Pitch Reader" | figlet
-echo $(cat README.md)
+echo "$(cat README.md)"
 
-xdg-open http://stackoverflow.com
+xdg-open "localhost:3000"
+npm start
