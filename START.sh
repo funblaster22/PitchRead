@@ -27,7 +27,7 @@ if [ "$sync" == "y" ]; then
 fi
 
 # Install npm packages
-if [ -f "$FILE" ]; then
+if [ ! -f "package-lock.json" ]; then
     echo "Updating packages..."
     npm install
 fi
@@ -38,5 +38,5 @@ cp scores.json dist/scores-backup.json
 echo "Pitch Reader" | figlet
 echo "$(cat README.md)"
 
-xdg-open "localhost:3000"
+xdg-open "http://localhost:3000"
 npm start
