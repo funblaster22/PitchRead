@@ -10,6 +10,9 @@
   // Seconds until the game resumes. -1 means indefinitely
   let resumeIn = 3;
 
+  if (!localStorage.name)
+    localStorage.name = prompt("What is your name? (will appear on online leaderboards)")
+
   // Why does this feel like REALLY bad design?
   async function countdown() {
     return new Promise<void>(res => {
@@ -34,6 +37,14 @@
     <ScrollingStaff a4={440} currentPitch={currentPitch} events={dispatcher} />
   </Card>
   <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn === -1 ? "none" : ""}`}>
+    {#await fetch("/scores").then(d => d.json()) then scores}
+      <h3>High Scores (using Linux server)</h3>
+      <ol>
+        {#each Object.entries(scores) as score (score[0])}
+          <li>{score[0]}: {score[1]}</li>
+        {/each}
+      </ol>
+    {/await}
     {#if resumeIn === 3}
       Paused. Click to resume.
     {:else}
@@ -55,6 +66,7 @@
      justify-content: center;
      height: 100vh;
      align-items: center;
+     flex-direction: column;
    }
 
    .overlay {

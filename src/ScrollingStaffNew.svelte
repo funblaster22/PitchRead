@@ -14,6 +14,11 @@
     export let events: EventTarget;
     export let paused = true;  // TODO: use this instead of events
 
+    if (!localStorage.score)
+        localStorage.score = 0
+    let score = localStorage.score;
+    $: localStorage.score = score;
+
     // Having to declare in global scope doesn't feel very Svelte-like
     let playingNoteGroup: SVGGElement;
     // 69 is the value of a4
@@ -172,6 +177,7 @@
             const x = transformMatrix.split(',')[4].trim();
             // And, finally, we set the note's style.transform property to send it skyward.
             group.style.transform = `translate(${x}px, -800px)`;
+            fetch(`/scores/add?user=${localStorage.name}&score=${++score}`);
             setTimeout(() => group.remove(), 5000);
         }
 

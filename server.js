@@ -9,7 +9,12 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.get("/scores", async (req, res) => {
-    res.json(JSON.parse(await fs.readFile("scores.json", "utf-8")));
+    let scores = JSON.parse(await fs.readFile("scores.json", "utf-8"));
+    scores = Object.entries(scores)
+        .sort(([,a],[,b]) => b-a)
+        .slice(0, 10)
+        .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+    res.json(scores);
 });
 
 // query params: user, score
