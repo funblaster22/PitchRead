@@ -33,10 +33,10 @@ if [ ! -f "package-lock.json" ]; then
 fi
 
 # Create backup of accounts.json file
-cp scores.json dist/scores-backup.json
+cp scores.json scores-backup.json
 
 echo "Pitch Reader" | figlet
 echo "$(cat README.md)"
 
-xdg-open "http://localhost:3000"
+xdg-open "http://localhost:3000/" &
 npm start
