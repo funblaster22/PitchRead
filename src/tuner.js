@@ -8,16 +8,16 @@ class Tuner {
     this.bufferSize = 4096
     this.noteStrings = [
       'C',
-      'C♯',
+      'C#',
       'D',
-      'D♯',
+      'D#',
       'E',
       'F',
-      'F♯',
+      'F#',
       'G',
-      'G♯',
+      'G#',
       'A',
-      'A♯',
+      'A#',
       'B'
     ]
 

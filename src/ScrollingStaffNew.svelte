@@ -11,6 +11,23 @@
     export let events: EventTarget;
     export let paused = true;  // TODO: use this instead of events
 
+    // Note should be formatted like: a#/4
+    function synonym(note: string | undefined) {
+        if (!note) return;
+        const noteName = note.split('/')[0];
+        const octave = Number.parseInt(note.at(-1));
+        const flatToSharp = {
+            'cb': 'b',
+            'db': 'c#',
+            'eb': 'd#',
+            'fb': 'e',
+            'gb': 'f#',
+            'ab': 'g#',
+            'bb': 'a#',
+        };
+        return (flatToSharp[noteName] || noteName) + "/" + (noteName === 'cb' ? octave - 1 : octave);
+    }
+
     if (!localStorage.score)
         localStorage.score = 0
     let score = localStorage.score;
@@ -21,7 +38,6 @@
     // 69 is the value of a4
     // TODO: because increments between notes are not uniform (e,f & b,c) it can get off but should be fine for now
     $: if (playingNoteGroup) playingNoteGroup.style.transform = "translateY(" + (69 - currentPitch.value + transpose) * 2.5 + "px)";
-    $: console.log(currentPitch);
 
     // Relates to [this issue](https://github.com/0xfe/vexflow/issues/544), which proposes https://jsfiddle.net/stevenkaspar/8gLbetyy/
     // Adapted from https://jsfiddle.net/gristow/Ln76ysjv/
@@ -58,7 +74,7 @@
         const durations = ['8', '4', '2', '1'];
 
         function makeNote([letter, acc, octave]) {
-            console.log(`${letter}${acc}/${octave}`);
+            //console.log(`${letter}${acc}/${octave}`);
             const note = new VF.StaveNote({
                 clef: 'treble',
                 keys: [`${letter}${acc}/${octave}`],
@@ -176,9 +192,8 @@
         }
 
         function check() {
-            console.log("CHECKING", visibleNoteGroups[0]?.dataset?.notename);
-            // TODO: doesn't account for note synonyms
-            if (currentPitch?.name?.toLowerCase() + "/" + currentPitch.octave === visibleNoteGroups[0]?.dataset?.notename)
+            console.log("CHECKING", synonym(visibleNoteGroups[0]?.dataset?.notename), "against", currentPitch?.name?.toLowerCase() + "/" + currentPitch.octave);
+            if (currentPitch?.name?.toLowerCase() + "/" + currentPitch.octave === synonym(visibleNoteGroups[0]?.dataset?.notename))
                 rightAnswer();
             requestAnimationFrame(check);
         }
