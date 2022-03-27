@@ -3,7 +3,6 @@ lockfileVersion: 5.3
 specifiers:
   '@sveltejs/vite-plugin-svelte': ^1.0.0-next.30
   '@tsconfig/svelte': ^2.0.1
-  '@types/vexflow': ^1.2.37
   aubiojs: ^0.0.1
   express: ^4.17.3
   nodemon: ^2.0.15
@@ -13,19 +12,18 @@ specifiers:
   svelte-preprocess: ^4.9.8
   tslib: ^2.3.1
   typescript: ^4.5.4
-  vexflow: ^3.0.9
+  vexflow: ^4.0.1
   vite: ^2.8.0
 
 dependencies:
   aubiojs: 0.0.1
   express: 4.17.3
   nodemon: 2.0.15
-  vexflow: 3.0.9
+  vexflow: 4.0.1
 
 devDependencies:
   '@sveltejs/vite-plugin-svelte': 1.0.0-next.38_svelte@3.46.4+vite@2.8.4
   '@tsconfig/svelte': 2.0.1
-  '@types/vexflow': 1.2.37
   npm-run-all: 4.1.5
   svelte: 3.46.4
   svelte-check: 2.4.5_svelte@3.46.4
@@ -115,10 +113,6 @@ packages:
     resolution: {integrity: sha512-BPdoIt1lfJ6B7rw35ncdwBZrAssjcwzI5LByIrYs+tpXlj/CAkuVdRsgZDdP4lq5EjyWzwxZCqAoFyHKFwp32g==}
     dependencies:
       '@types/node': 17.0.21
-    dev: true
-
-  /@types/vexflow/1.2.37:
-    resolution: {integrity: sha512-5W8MizL4+PtxGZI2nYtmdxFTRh/D+/YxjtO9eKOSD9hncy4Kny3MBRP0/sxBCSgDUd2KnZ2R6Fe4b6YrXalLuQ==}
     dev: true
 
   /abbrev/1.1.1:
@@ -2112,8 +2106,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
-  /vexflow/3.0.9:
-    resolution: {integrity: sha512-JzDUC3SZvyRxvALv0UrlgCJSH7WzNSShNjXK0rTWqDJscCcytrTWLT3LYtsDvby8qbszdaD708xOe9D79FLTFA==}
+  /vexflow/4.0.1:
+    resolution: {integrity: sha512-dHfP1qB6m/+CV3ecvmHZrRZjXvUZDdFVUYTM20uC8Bz8kBten4cA9K83av2S5QfjUWZ9gTD9rE+CwBi6bM/aNQ==}
     dev: false
 
   /vite/2.8.4:

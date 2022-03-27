@@ -1,13 +1,10 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    // I added a `export default Vex` to the d.ts file
     // useful examples: http://www.vexflow.com/build/docs/note.html & https://github.com/0xfe/vexflow/wiki/Tutorial
-    // TODO: for some reason the typing on this module is funky
     // Also considering https://www.verovio.org/index.xhtml, but the docs are lacking
-    import Vex from "vexflow";
-    import Note = Vex.Flow.Note;
+    import {Flow as VF, StaveNote} from "vexflow";
 
-    let musicStaff: HTMLElement;
+    let musicStaff: HTMLDivElement;
     // In the format <note><accidental>/<octave>, replacing the values in square brackets
     export let currentPitch: {name, value, cents, octave, frequency};
     export let transpose = 0;
@@ -29,9 +26,6 @@
     // Relates to [this issue](https://github.com/0xfe/vexflow/issues/544), which proposes https://jsfiddle.net/stevenkaspar/8gLbetyy/
     // Adapted from https://jsfiddle.net/gristow/Ln76ysjv/
     onMount(() => {
-        // Basic setup boilerplate for using VexFlow with the SVG rendering context:
-        const VF = Vex.Flow;
-
         // Create an SVG renderer and attach it to the DIV element named "boo".
         const renderer = new VF.Renderer(musicStaff, VF.Renderer.Backends.SVG);
 
@@ -82,7 +76,7 @@
             // note or so we might render a natural sign randomly, just to be
             // sure our user who's learning to read accidentals learns
             // what the natural symbol means.)
-            if(acc) note.addAccidental(0, new VF.Accidental(acc));
+            if(acc) note.addModifier(new VF.Accidental(acc));
             tickContext.addTickable(note);
             // The tickContext.preFormat() call assigns x-values (and other
             // formatting values) to notes. It must be called after we've
@@ -100,7 +94,7 @@
             return note;
         }
 
-        const notes: Note[] = [];
+        const notes: StaveNote[] = [];
 
         const playingNote = new VF.StaveNote({
             clef: 'treble',
@@ -126,7 +120,7 @@
         // Add a note to the staff from the notes array (if there are any left).
         function addNote() {
             // TODO: right now, none of them work
-            const acc = ['b', '', '#'][Math.floor(Math.random() * 5)]
+            const acc = ['b', '', '#'][Math.floor(Math.random() * 3)];
             const details = [(Math.floor(Math.random() * 7) + 10).toString(36), acc, Math.floor(Math.random() * 2) + 4];
             notes.push(makeNote(details));
             const note = notes.shift();
