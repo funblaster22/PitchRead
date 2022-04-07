@@ -5,22 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "serve": "nodemon server.js",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "start": "npm-run-all -p dev serve"
+    "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
     "aubiojs": "^0.0.1",
-    "express": "^4.17.3",
-    "nodemon": "^2.0.15",
     "vexflow": "^4.0.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tsconfig/svelte": "^2.0.1",
-    "npm-run-all": "^4.1.5",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.7",
     "svelte-preprocess": "^4.9.8",
