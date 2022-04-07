@@ -1,7 +1,7 @@
 <script lang="ts">
   import Card from "./lib/Card.svelte";
   import Tuner from "./tuner";
-  import ScrollingStaff from "./ScrollingStaffNew.svelte";
+  import ScrollingStaff from "./ScrollingStaff.svelte";
   const tuner = new Tuner(440);
   let currentPitch = 440;
   tuner.onNoteDetected = note => currentPitch = note;
