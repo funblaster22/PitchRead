@@ -87,6 +87,10 @@ class Tuner {
         })
   }
 
+  stopRecord() {
+    this.audioContext.close()
+  }
+
   init() {
     this.audioContext = new window.AudioContext()
     this.analyser = this.audioContext.createAnalyser()
@@ -157,6 +161,7 @@ class Tuner {
     this.oscillator.frequency.value = frequency
   }
 
+  /** Stop playing the musical note */
   stop() {
     this.oscillator.stop()
     this.oscillator = null

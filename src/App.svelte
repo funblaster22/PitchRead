@@ -5,9 +5,8 @@
   const tuner = new Tuner(440);
   let currentPitch = 440;
   tuner.onNoteDetected = note => currentPitch = note;
-  const dispatcher = new EventTarget();
 
-  // Seconds until the game resumes. -1 means indefinitely
+  // Seconds until the game resumes. -1 means playing, 3 is indefinitely
   let resumeIn = 3;
 
   // Why does this feel like REALLY bad design?
@@ -15,7 +14,7 @@
     return new Promise<void>(res => {
       if (resumeIn-- > 0) {
         console.log(resumeIn);
-        setTimeout(async () => res(await countdown()), 1000);
+        setTimeout(async () => res(await countdown()), 800);
       } else
         res();
     });
@@ -24,14 +23,19 @@
   async function start() {
     await countdown();
     tuner.init();
-    dispatcher.dispatchEvent(new Event("resume"))
   }
+
+  // Detect click outside browser or changing tabs (instead of visibilitychange which just detects tab changes)
+  window.addEventListener('blur', ev => {
+    tuner.stopRecord();
+    resumeIn = 3;
+  });
 </script>
 
 <!-- Consider using https://github.com/0xfe/vexflow or https://www.verovio.org/index.xhtml for rendering music -->
 <main class="perfect-center">
   <Card>
-    <ScrollingStaff a4={440} currentPitch={currentPitch} events={dispatcher} />
+    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} />
   </Card>
   <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn === -1 ? "none" : ""}`}>
     {#if resumeIn === 3}
