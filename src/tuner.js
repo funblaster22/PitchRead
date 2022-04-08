@@ -1,25 +1,26 @@
 import aubio from "aubiojs";
 
+export const noteStrings = [
+  'C',
+  'C#',
+  'D',
+  'D#',
+  'E',
+  'F',
+  'F#',
+  'G',
+  'G#',
+  'A',
+  'A#',
+  'B'
+]
+
 // Adapted from https://github.com/qiuxiang/tuner/blob/master/app/tuner.js
-class Tuner {
+export default class Tuner {
   constructor (a4) {
     this.middleA = a4 || 440
     this.semitone = 69
     this.bufferSize = 4096
-    this.noteStrings = [
-      'C',
-      'C#',
-      'D',
-      'D#',
-      'E',
-      'F',
-      'F#',
-      'G',
-      'G#',
-      'A',
-      'A#',
-      'B'
-    ]
 
     this.initGetUserMedia()
   }
@@ -73,10 +74,10 @@ class Tuner {
             if (frequency && self.onNoteDetected) {
               const note = self.getNote(frequency)
               self.onNoteDetected({
-                name: self.noteStrings[note % 12],
+                name: noteStrings[note % 12],
                 value: note,
                 cents: self.getCents(frequency, note),
-                octave: parseInt(note / 12) - 1,
+                octave: Math.floor(note / 12) - 1,
                 frequency: frequency
               })
             }
@@ -170,5 +171,3 @@ class Tuner {
   /** TO BE IMPLEMENTED BY CLIENT */
   onNoteDetected({name, value, cents, octave, frequency}) {}
 }
-
-export default Tuner;

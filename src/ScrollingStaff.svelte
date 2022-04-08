@@ -6,7 +6,6 @@
 
     // In the format <note><accidental>/<octave>, replacing the values in square brackets
     export let currentPitch: {name, value, cents, octave, frequency};
-    export let transpose = 0;
     export let paused = true;
 
     // Note should be formatted like: a#/4
@@ -26,8 +25,10 @@
         return (flatToSharp[noteName] || noteName) + "/" + (noteName === 'cb' ? octave - 1 : octave);
     }
 
-    function transposeNote() {
-
+    /** Get note name from MIDI value */
+    function noteName(MIDIval: number): string | undefined {
+        if (isNaN(MIDIval)) return;
+        //return tuner.noteStrings[note % 12]
     }
 
     // Reference [this issue](https://github.com/0xfe/vexflow/issues/544), which proposes https://jsfiddle.net/stevenkaspar/8gLbetyy/
@@ -189,7 +190,7 @@
 
     // 69 is the value of a4
     // TODO: because increments between notes are not uniform (e,f & b,c) it can get off but should be fine for now
-    $: if (Controller.playingNoteGroup) Controller.playingNoteGroup.style.transform = "translateY(" + (69 - currentPitch.value + transpose) * 2.5 + "px)";
+    $: if (Controller.playingNoteGroup) Controller.playingNoteGroup.style.transform = "translateY(" + (69 - currentPitch.value) * 2.5 + "px)";
     $: if (paused) pause(); else resume();
     $: {
       console.log("CHECKING", synonym(Controller.visibleNoteGroups[0]?.dataset?.notename), "against", currentPitch?.name?.toLowerCase() + "/" + currentPitch.octave);
