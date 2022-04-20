@@ -3,6 +3,7 @@
   import Tuner, {noteStrings} from "./tuner";
   import ScrollingStaff from "./ScrollingStaff.svelte";
   import type {Clef, Pitch} from "./lib/types";
+  import {writable} from "svelte/store";
   const tuner = new Tuner(440);
   let currentPitch: Partial<Pitch> = {};
   tuner.onNoteDetected = (note: Pitch) => {
@@ -15,10 +16,11 @@
   // Seconds until the game resumes. -1 means playing, 3 is indefinitely
   let resumeIn = 3;
   let transpose = Number.parseInt(localStorage.transpose) || 0;
-  let bpm = Number.parseInt(localStorage.bpm) || 60;
+  let bpm = writable(Number.parseInt(localStorage.bpm) || 60);
   let waitCorrect = (localStorage.waitCorrect === "true") || false;
   let accidentals = JSON.parse(localStorage.getItem("accidentals")) || ["", "b", "#"];
   let clef: Clef = localStorage.clef || "treble";
+  let accuracy = 0;
 
   // Why does this feel like REALLY bad design?
   async function countdown() {
@@ -45,7 +47,7 @@
   window.addEventListener('blur', pause);
 
   $: localStorage.transpose = transpose;
-  $: localStorage.bpm = bpm;
+  $: localStorage.bpm = $bpm;
   $: localStorage.waitCorrect = waitCorrect;
   $: localStorage.accidentals = JSON.stringify(accidentals);
   $: localStorage.clef = clef;
@@ -54,14 +56,18 @@
 <!-- Consider using https://github.com/0xfe/vexflow or https://www.verovio.org/index.xhtml for rendering music -->
 <main class="perfect-center">
   <div id="scores">
-    Speed: {bpm} bpm<br />
-    Accuracy: 0%
+    Speed: {$bpm} bpm<br />
+    Accuracy: {accuracy}%
   </div>
   <div id="pause">
-    <button on:click={pause}>⏸️</button>
+    {#if resumeIn === 3}
+      <button on:click={start}>▶️</button>
+    {:else}
+      <button on:click={pause}>⏸️</button>
+    {/if}
   </div>
   <Card>
-    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} />
+    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} on:note={ev => accuracy = ev.detail} />
   </Card>
   <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn === -1 ? "none" : ""}`}>
     {#if resumeIn === 3}
@@ -79,6 +85,11 @@
         <label>
           Transpose half-steps:
           <input type="number" min="-48" max="48" bind:value={transpose} />
+        </label>
+        <label>
+          BPM:
+          <input type="range" bind:value={$bpm} min="1" max="200" disabled={waitCorrect} />
+          <input bind:value={$bpm} type="number" min="1" max="200" disabled={waitCorrect} />
         </label>
         <hr />
         <ul>
@@ -126,12 +137,14 @@
      color: white;
      cursor: zoom-out;
      background-color: rgba(0, 0, 0, 50%);
+     z-index: 1000;
    }
 
    #scores {
      position: fixed;
      top: 0;
      right: 0;
+     width: 8em;
    }
 
    #pause {

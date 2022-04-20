@@ -12,5 +12,8 @@ export interface Pitch {
   value: number;
 }
 
+// Does not work unfortunately
+//export const clefs = Object.freeze(Object.keys(VFClef.types) as const);
+
 export const clefs = Object.freeze(['treble', 'bass', 'alto', 'tenor', 'percussion', 'soprano', 'mezzo-soprano', 'baritone-c', 'baritone-f', 'subbass', 'french', 'tab'] as const);
 export type Clef = typeof clefs;

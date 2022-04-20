@@ -1,15 +1,20 @@
 <script lang="ts">
-    import {onMount} from "svelte";
+  import {createEventDispatcher, onMount} from "svelte";
     // useful examples: http://www.vexflow.com/build/docs/note.html & https://github.com/0xfe/vexflow/wiki/Tutorial
     // Also considering https://www.verovio.org/index.xhtml, but the docs are lacking
     import {Flow as VF, RenderContext, StaveNote} from "vexflow";
     import type {Clef} from "./lib/types.ts";
+    import {Writable} from "svelte/store";
 
     // In the format <note><accidental>/<octave>, replacing the values in square brackets
     export let currentPitch: {name, value, cents, octave, frequency};
     export let paused = true;
     export let accidentals: string[];
     export let clef: Clef;
+    export let bpm: Writable<number>;
+
+    const dispatch = createEventDispatcher();
+    let accuracy: [number, number] = [0, 0];
 
     // Note should be formatted like: a#/4
     function synonym(note: string | undefined) {
@@ -48,7 +53,7 @@
 
       // Create a stave of width 10000 at position 10, 40 on the canvas.
       const stave = new VF.Stave(10, 10, 10000)
-        .addClef(clef);
+        .addClef(clef as string);
 
       // A tickContext is required to draw anything that would be placed (x value)
       const tickContext = new VF.TickContext();
@@ -159,6 +164,9 @@
           const index = visibleNoteGroups.indexOf(group);
           if (index === -1) return;
           group.classList.add('too-slow');
+          if (!paused)
+            accuracy[1]++;
+          dispatch("note", Math.round(accuracy[0] / accuracy[1] * 1000) / 10);
           visibleNoteGroups.shift();
           setTimeout(() => group.remove(), 5000);
         }, 5000);
@@ -171,6 +179,9 @@
       export function rightAnswer() {
         const group = visibleNoteGroups.shift();
         group.classList.add('correct');
+        accuracy[0]++;
+        accuracy[1]++;
+        dispatch("note", Math.round(accuracy[0] / accuracy[1] * 1000) / 10);
         // The note will be somewhere in the middle of its move to the left -- by
         // getting its computed style we find its x-position, freeze it there, and
         // then send it straight up to note heaven with no horizontal motion.
@@ -204,7 +215,7 @@
     let animateInterval: number;
     function resume() {
       //Controller.check();
-      animateInterval = window.setInterval(Controller.addNote, 1000);
+      animateInterval = window.setInterval(Controller.addNote, 60 / $bpm * 1000);
       /* This should work, but it doesn't
       navigator.mediaDevices.getUserMedia({audio: true}).then(stream =>
         stream.getAudioTracks().forEach(track => track.enabled = true)
