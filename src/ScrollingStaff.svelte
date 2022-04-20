@@ -3,10 +3,13 @@
     // useful examples: http://www.vexflow.com/build/docs/note.html & https://github.com/0xfe/vexflow/wiki/Tutorial
     // Also considering https://www.verovio.org/index.xhtml, but the docs are lacking
     import {Flow as VF, RenderContext, StaveNote} from "vexflow";
+    import type {Clef} from "./lib/types.ts";
 
     // In the format <note><accidental>/<octave>, replacing the values in square brackets
     export let currentPitch: {name, value, cents, octave, frequency};
     export let paused = true;
+    export let accidentals: string[];
+    export let clef: Clef;
 
     // Note should be formatted like: a#/4
     function synonym(note: string | undefined) {
@@ -45,7 +48,7 @@
 
       // Create a stave of width 10000 at position 10, 40 on the canvas.
       const stave = new VF.Stave(10, 10, 10000)
-        .addClef('treble');
+        .addClef(clef);
 
       // A tickContext is required to draw anything that would be placed (x value)
       const tickContext = new VF.TickContext();
@@ -129,7 +132,7 @@
       // Add a note to the staff from the notes array (if there are any left).
       export function addNote() {
         // TODO: right now, none of them work
-        const acc = ['b', '', '#'][Math.floor(Math.random() * 3)];
+        const acc = accidentals[Math.floor(Math.random() * accidentals.length)];
         const details = [(Math.floor(Math.random() * 7) + 10).toString(36), acc, Math.floor(Math.random() * 2) + 4];
         notes.push(makeNote(details));
         const note = notes.shift();
