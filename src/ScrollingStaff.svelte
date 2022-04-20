@@ -12,9 +12,13 @@
     export let accidentals: string[];
     export let clef: Clef;
     export let bpm: Writable<number>;
+    export let waitCorrect: boolean;
 
     const dispatch = createEventDispatcher();
+    // if !waitCorrect:
     let accuracy: [number, number] = [0, 0];
+    // else if waitCorrect:
+    let startTime = performance.now();
 
     // Note should be formatted like: a#/4
     function synonym(note: string | undefined) {
@@ -160,19 +164,32 @@
         group.classList.add('scrolling');
 
         // If a user doesn't answer in time make the note fall below the staff
-        window.setTimeout(() => {
-          const index = visibleNoteGroups.indexOf(group);
-          if (index === -1) return;
-          group.classList.add('too-slow');
-          if (!paused)
-            accuracy[1]++;
-          dispatch("note", Math.round(accuracy[0] / accuracy[1] * 1000) / 10);
-          visibleNoteGroups.shift();
-          setTimeout(() => group.remove(), 5000);
-        }, 5000);
-        /*playingNote.addAccidental(0, new VF.Accidental(acc));
-        playingTickContext.preFormat().setX(0);
-        playingNote.draw();  // TODO: seems like the best way to do this involves creating a group*/
+        if (!waitCorrect) {
+          window.setTimeout(() => {
+            const index = visibleNoteGroups.indexOf(group);
+            if (index === -1) return;
+            group.classList.add('too-slow');
+            if (!paused)
+              accuracy[1]++;
+            dispatch("note", Math.round(accuracy[0] / accuracy[1] * 1000) / 10);
+            visibleNoteGroups.shift();
+            setTimeout(() => group.remove(), 5000);
+          }, 5000);
+          /*playingNote.addAccidental(0, new VF.Accidental(acc));
+          playingTickContext.preFormat().setX(0);
+          playingNote.draw();  // TODO: seems like the best way to do this involves creating a group*/
+        }
+        repositionNotes();
+      }
+
+      /** Moves all displayed notes if wait until correct setting enabled */
+      function repositionNotes() {
+        if (waitCorrect) {
+          visibleNoteGroups.forEach((group, i) => {
+            // move by 80 pixels each time
+            group.style.transform = `translate(${-400 + 80 * i}px, 0)`;
+          });
+        }
       }
 
       // If a user plays/identifies the note in time, send it up to note heaven.
@@ -181,6 +198,10 @@
         group.classList.add('correct');
         accuracy[0]++;
         accuracy[1]++;
+        if (waitCorrect) {
+          addNote();
+          $bpm = Math.round(accuracy[1] / ((performance.now() - startTime) / (60 * 1000)));
+        }
         dispatch("note", Math.round(accuracy[0] / accuracy[1] * 1000) / 10);
         // The note will be somewhere in the middle of its move to the left -- by
         // getting its computed style we find its x-position, freeze it there, and
@@ -215,7 +236,12 @@
     let animateInterval: number;
     function resume() {
       //Controller.check();
-      animateInterval = window.setInterval(Controller.addNote, 60 / $bpm * 1000);
+      startTime = performance.now();
+      if (!waitCorrect)
+        animateInterval = window.setInterval(Controller.addNote, 60 / $bpm * 1000);
+      else
+        for (let i = 0; i < 5; i++)
+          Controller.addNote();
       /* This should work, but it doesn't
       navigator.mediaDevices.getUserMedia({audio: true}).then(stream =>
         stream.getAudioTracks().forEach(track => track.enabled = true)

@@ -67,7 +67,7 @@
     {/if}
   </div>
   <Card>
-    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} on:note={ev => accuracy = ev.detail} />
+    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} {waitCorrect} on:note={ev => accuracy = ev.detail} />
   </Card>
   <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn === -1 ? "none" : ""}`}>
     {#if resumeIn === 3}
@@ -85,6 +85,10 @@
         <label>
           Transpose half-steps:
           <input type="number" min="-48" max="48" bind:value={transpose} />
+        </label>
+        <label>
+          <input type="checkbox" bind:checked={waitCorrect} />
+          Wait for correct note
         </label>
         <label>
           BPM:
