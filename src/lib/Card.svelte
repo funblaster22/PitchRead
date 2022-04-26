@@ -19,6 +19,7 @@
         width: 100%;
         height: fit-content;
         padding: 0.5em;
+        z-index: 10;
     }
 
     #card :global(img) {

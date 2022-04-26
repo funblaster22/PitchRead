@@ -4,6 +4,7 @@
   import ScrollingStaff from "./ScrollingStaff.svelte";
   import type {Clef, Pitch} from "./lib/types";
   import {writable} from "svelte/store";
+  import Intonation from "./Intonation.svelte";
   const tuner = new Tuner(440);
   let currentPitch: Partial<Pitch> = {};
   tuner.onNoteDetected = (note: Pitch) => {
@@ -69,7 +70,8 @@
   <Card>
     <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} {waitCorrect} on:note={ev => accuracy = ev.detail} />
   </Card>
-  <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn === -1 ? "none" : ""}`}>
+  <Intonation cents={currentPitch.cents} />
+  <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn < 0 ? "none" : ""}`}>
     {#if resumeIn === 3}
       Paused. Click to resume.
       <div on:click|stopPropagation>
