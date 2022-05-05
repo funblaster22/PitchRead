@@ -19,6 +19,7 @@
   let transpose = Number.parseInt(localStorage.transpose) || 0;
   let bpm = writable(Number.parseInt(localStorage.bpm) || 60);
   let waitCorrect = (localStorage.waitCorrect === "true") || false;
+  let showNames = (localStorage.showNames === "true") || false;
   let accidentals = JSON.parse(localStorage.getItem("accidentals")) || ["", "b", "#"];
   let clef: Clef = localStorage.clef || "treble";
   let accuracy = 0;
@@ -50,6 +51,7 @@
   $: localStorage.transpose = transpose;
   $: localStorage.bpm = $bpm;
   $: localStorage.waitCorrect = waitCorrect;
+  $: localStorage.showNames = showNames;
   $: localStorage.accidentals = JSON.stringify(accidentals);
   $: localStorage.clef = clef;
 </script>
@@ -58,7 +60,12 @@
 <main class="perfect-center">
   <div id="scores">
     Speed: {$bpm} bpm<br />
-    Accuracy: {accuracy}%
+    Accuracy: {accuracy}%<br />
+    Pitch: {currentPitch.cents || 0}¢
+    {#if showNames}
+      <br />
+      Playing note: {currentPitch.name || "none"}
+    {/if}
   </div>
   <div id="pause">
     {#if resumeIn === 3}
@@ -68,7 +75,7 @@
     {/if}
   </div>
   <Card>
-    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} {waitCorrect} on:note={ev => accuracy = ev.detail} />
+    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} {waitCorrect} {showNames} on:note={ev => accuracy = ev.detail} />
   </Card>
   <Intonation cents={currentPitch.cents} />
   <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn < 0 ? "none" : ""}`}>
@@ -97,12 +104,17 @@
           <input type="range" bind:value={$bpm} min="1" max="200" disabled={waitCorrect} />
           <input bind:value={$bpm} type="number" min="1" max="200" disabled={waitCorrect} />
         </label>
+        <label>
+          <input type="checkbox" bind:checked={showNames} />
+          Show note names
+        </label>
         <hr />
         <ul>
           <li><label><input type="radio" bind:group={clef} value="treble">Treble clef</label></li>
         </ul>
         <ul>
-          <li><label><input type="checkbox" bind:group={accidentals} value="">Naturals</label></li>
+          <li><label><input type="checkbox" bind:group={accidentals} value="">Nothing</label></li>
+          <li><label><input type="checkbox" bind:group={accidentals} value="n">Naturals</label></li>
           <li><label><input type="checkbox" bind:group={accidentals} value="#">Sharps</label></li>
           <li><label><input type="checkbox" bind:group={accidentals} value="b">Flats</label></li>
           <li><label><input type="checkbox" bind:group={accidentals} value="##">Double sharps</label></li>
@@ -150,7 +162,8 @@
      position: fixed;
      top: 0;
      right: 0;
-     width: 8em;
+     padding-right: 1em;
+     text-align: right;
    }
 
    #pause {

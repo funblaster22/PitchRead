@@ -2,7 +2,7 @@
   import {createEventDispatcher, onMount} from "svelte";
     // useful examples: http://www.vexflow.com/build/docs/note.html & https://github.com/0xfe/vexflow/wiki/Tutorial
     // Also considering https://www.verovio.org/index.xhtml, but the docs are lacking
-    import {Flow as VF, RenderContext, StaveNote} from "vexflow";
+  import {Annotation, Flow as VF, RenderContext, StaveNote} from "vexflow";
     import type {Clef} from "./lib/types.ts";
     import {Writable} from "svelte/store";
 
@@ -13,6 +13,7 @@
     export let clef: Clef;
     export let bpm: Writable<number>;
     export let waitCorrect: boolean;
+    export let showNames: boolean;
 
     const dispatch = createEventDispatcher();
     // if !waitCorrect:
@@ -100,16 +101,19 @@
         playingNoteGroup.classList.add("playingNote")
       }
 
-      function makeNote([letter, acc, octave]) {
+      function makeNote([letter, acc, octave]: [string, string, string]) {
         //console.log(`${letter}${acc}/${octave}`);
         const durations = ['8', '4', '2', '1'];
         const note = new VF.StaveNote({
           clef: 'treble',
           keys: [`${letter}${acc}/${octave}`],
           duration: durations[Math.floor(Math.random() * durations.length)],
+          auto_stem: true,
         })
           .setContext(context)
           .setStave(stave);
+        if (showNames)
+            note.addModifier(new Annotation(letter.toUpperCase() + acc), 0);
 
         // If a StaveNote has an accidental, we must render it manually.
         // This is so that you get full control over whether to render
