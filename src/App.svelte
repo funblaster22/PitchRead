@@ -128,47 +128,47 @@
 </main>
 
 <style>
-   main {
-     text-align: center;
-     padding: 0.5em;
-     max-width: 848px;
-     margin: 0 auto;
-   }
+  main {
+    text-align: center;
+    padding: 0.5em;
+    max-width: 848px;
+    margin: 0 auto;
+  }
 
-   ul {
-     list-style: none;
-     padding: 0;
-   }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
 
-   .perfect-center {
-     display: flex;
-     justify-content: center;
-     height: 100vh;
-     align-items: center;
-     flex-direction: column;
-   }
+  .perfect-center {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    align-items: center;
+    flex-direction: column;
+  }
 
-   .overlay {
-     position: fixed;
-     width: 100vw;
-     height: 100vh;
-     color: white;
-     cursor: zoom-out;
-     background-color: rgba(0, 0, 0, 50%);
-     z-index: 1000;
-   }
+  .overlay {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    color: white;
+    cursor: zoom-out;
+    background-color: rgba(0, 0, 0, 50%);
+    z-index: 1000;
+  }
 
-   #scores {
-     position: fixed;
-     top: 0;
-     right: 0;
-     padding-right: 1em;
-     text-align: right;
-   }
+  #scores {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding-right: 1em;
+    text-align: right;
+  }
 
-   #pause {
-     position: fixed;
-     top: 0;
-     left: 0;
-   }
+  #pause {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
 </style>
