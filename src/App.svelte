@@ -23,6 +23,7 @@
   let accidentals = JSON.parse(localStorage.getItem("accidentals")) || ["", "b", "#"];
   let clef: Clef = localStorage.clef || "treble";
   let accuracy = 0;
+  let keySig = localStorage.keySig || "C";
 
   // Why does this feel like REALLY bad design?
   async function countdown() {
@@ -46,14 +47,23 @@
   }
 
   // Detect click outside browser or changing tabs (instead of visibilitychange which just detects tab changes)
-  window.addEventListener('blur', pause);
+  window.addEventListener("blur", pause);
+  window.addEventListener("message", msg => {
+    if (location.origin === msg.origin) {
+      console.log("KEYSIG", msg.data);
+      keySig = msg.data as string;
+      location.reload(); // TODO: requestAnimationFrame or IdleCallback if not committing to localStorage
+    }
+  });
 
   $: localStorage.transpose = transpose;
   $: localStorage.bpm = $bpm;
   $: localStorage.waitCorrect = waitCorrect;
   $: localStorage.showNames = showNames;
   $: localStorage.accidentals = JSON.stringify(accidentals);
+  // Special cases, must reload. Easiest way (otherwise basically have to rerender entire stave)
   $: localStorage.clef = clef;
+  $: localStorage.keySig = keySig;
 </script>
 
 <!-- Consider using https://github.com/0xfe/vexflow or https://www.verovio.org/index.xhtml for rendering music -->
@@ -75,13 +85,13 @@
     {/if}
   </div>
   <Card>
-    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} {waitCorrect} {showNames} on:note={ev => accuracy = ev.detail} />
+    <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} {waitCorrect} {showNames} {keySig} on:note={ev => accuracy = ev.detail} />
   </Card>
   <Intonation cents={currentPitch.cents} />
   <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn < 0 ? "none" : ""}`}>
     {#if resumeIn === 3}
       Paused. Click to resume.
-      <div on:click|stopPropagation>
+      <div on:click|stopPropagation style="overflow: auto">
         <!-- https://makingmusicmag.com/a-simple-guide-to-transposing/ -->
         <select bind:value={transpose}>
           <option value={0}>Concert (piano, flute)</option>
@@ -109,8 +119,9 @@
           Show note names
         </label>
         <hr />
-        <ul>
+        <ul on:click={location.reload.bind(location)}>
           <li><label><input type="radio" bind:group={clef} value="treble">Treble clef</label></li>
+          <li><label><input type="radio" bind:group={clef} value="bass">Bass clef</label></li>
         </ul>
         <ul>
           <li><label><input type="checkbox" bind:group={accidentals} value="">Nothing</label></li>
@@ -120,6 +131,11 @@
           <li><label><input type="checkbox" bind:group={accidentals} value="##">Double sharps</label></li>
           <li><label><input type="checkbox" bind:group={accidentals} value="bb">Double flats</label></li>
         </ul>
+        <label>Lowest note:</label>
+        <label>Highest note:</label>
+        <label>Key signature: {keySig}</label>
+        <!-- TODO: use embed or object? With object I can include a fallback, but I'm targeting modern browsers anyways. Both support scripting -->
+        <embed type="image/svg+xml" src="fifths-circle.svg" style="width: 20em" />
       </div>
     {:else}
       Resuming in {resumeIn + 1}

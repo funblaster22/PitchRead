@@ -14,6 +14,7 @@
   export let bpm: Writable<number>;
   export let waitCorrect: boolean;
   export let showNames: boolean;
+  export let keySig = "C";
 
   const dispatch = createEventDispatcher();
   // if !waitCorrect:
@@ -57,8 +58,9 @@
     export const visibleNoteGroups: SVGElement[] = [];
 
     // Create a stave of width 10000 at position 10, 40 on the canvas.
-    const stave = new VF.Stave(10, 10, 10000)
-      .addClef(clef as string);
+    export const stave = new VF.Stave(10, 10, 10000)
+      .addClef(clef as string)
+      .addKeySignature(keySig);
 
     // A tickContext is required to draw anything that would be placed (x value)
     const tickContext = new VF.TickContext();
