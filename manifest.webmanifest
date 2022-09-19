@@ -1,1 +1,1 @@
-{"name":"PitchRead","short_name":"PitchRead","start_url":"/PitchRead/","display":"standalone","background_color":"#00579a","lang":"en","scope":"/PitchRead/","icons":[{"src":"maskable.jpg","sizes":"any","purpose":"any maskable"}],"theme_color":"#00579a"}
+{"name":"PitchRead","short_name":"PitchRead","start_url":"/PitchRead/","display":"standalone","background_color":"#00579a","lang":"en","scope":"/PitchRead/","icons":[{"src":"maskable.png","sizes":"any","purpose":"any maskable"}],"theme_color":"#00579a"}
