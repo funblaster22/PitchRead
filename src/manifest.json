@@ -1,0 +1,14 @@
+{
+    "short_name": "PitchRead",
+    "name": "PitchRead",
+    "icons": [
+        {
+            "src": "maskable.png",
+            "sizes": "any",
+            "purpose": "any maskable"
+        }
+    ],
+    "background_color": "#00579a",
+    "display": "standalone",
+    "theme_color": "#00579a"
+}
