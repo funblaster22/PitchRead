@@ -36,9 +36,11 @@
     });
   }
 
-  async function start() {
-    await countdown();
-    tuner.init();
+  async function start(ev: MouseEvent) {
+    if (ev.target === ev.currentTarget) {  // TODO: why do I need this check?
+      await countdown();
+      tuner.init();
+    }
   }
 
   function pause() {
@@ -88,10 +90,9 @@
     <ScrollingStaff currentPitch={currentPitch} paused={resumeIn !== -1} {accidentals} {clef} {bpm} {waitCorrect} {showNames} {keySig} on:note={ev => accuracy = ev.detail} />
   </Card>
   <Intonation cents={currentPitch.cents} />
-  <div class="overlay perfect-center" on:click={start} style={`display:${resumeIn < 0 ? "none" : ""}`}>
+  <div class="overlay" on:click={start} style={`overflow: hidden auto; display:${resumeIn < 0 ? "none" : ""}`}>
     {#if resumeIn === 3}
-      Paused. Click to resume.
-      <div on:click|stopPropagation style="overflow: auto">
+        <p>Paused. Click to resume.</p>
         <!-- https://makingmusicmag.com/a-simple-guide-to-transposing/ -->
         <select bind:value={transpose}>
           <option value={0}>Concert (piano, flute)</option>
@@ -118,7 +119,7 @@
           <input type="checkbox" bind:checked={showNames} />
           Show note names
         </label>
-        <hr />
+        <hr class="constrained-fluid-width" />
         <ul on:click={location.reload.bind(location)}>
           <li><label><input type="radio" bind:group={clef} value="treble">Treble clef</label></li>
           <li><label><input type="radio" bind:group={clef} value="bass">Bass clef</label></li>
@@ -135,8 +136,7 @@
         <label>Highest note:</label>
         <label>Key signature: {keySig}</label>
         <!-- TODO: use embed or object? With object I can include a fallback, but I'm targeting modern browsers anyways. Both support scripting -->
-        <embed type="image/svg+xml" src="fifths-circle.svg" style="width: 20em" />
-      </div>
+        <embed type="image/svg+xml" src="fifths-circle.svg" class="constrained-fluid-width" />
     {:else}
       Resuming in {resumeIn + 1}
     {/if}
@@ -154,6 +154,10 @@
   ul {
     list-style: none;
     padding: 0;
+    width: min-content;
+    margin-left: auto;
+    margin-right: auto;
+    white-space: nowrap;
   }
 
   .perfect-center {
@@ -172,6 +176,11 @@
     cursor: zoom-out;
     background-color: rgba(0, 0, 0, 50%);
     z-index: 1000;
+  }
+  
+  .constrained-fluid-width {
+    width: 100vw;
+    max-width: 20em;
   }
 
   #scores {
