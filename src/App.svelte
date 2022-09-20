@@ -39,11 +39,13 @@
   async function start(ev: MouseEvent) {
     if (ev.target === ev.currentTarget) {  // TODO: why do I need this check?
       await countdown();
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#eee');
       tuner.init();
     }
   }
 
   function pause() {
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#777');
     tuner.stopRecord();
     resumeIn = 3;
   }
