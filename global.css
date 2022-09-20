@@ -42,6 +42,8 @@ a:visited {
 
 label {
 	display: block;
+	width: fit-content;
+	margin: auto;
 }
 
 input, button, select, textarea {
